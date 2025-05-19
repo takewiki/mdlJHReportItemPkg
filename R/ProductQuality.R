@@ -67,8 +67,29 @@ ProductQuality_inputdelete<- function(erp_token) {
 
   sql=paste0("
 
-delete from  rds_t_ProductQuality_input where FMaterialNumber='' or FMaterialNumber is null or FMaterialNumber in (select FMaterialNumber  from rds_t_ProductQuality)
+ delete from  rds_t_ProductQuality_input where FMaterialNumber='' or FMaterialNumber is null
 
+             ")
+
+  res=tsda::sql_delete2(token = erp_token,sql_str = sql )
+  return(res)
+}
+
+#' 覆盖前删除
+#'
+#' @param erp_token
+
+#' @return 无返回值
+#' @export
+#'
+#' @examples
+#' ProductQuality_delete()
+ProductQuality_delete<- function(erp_token) {
+
+  sql=paste0("
+
+
+ delete from  rds_t_ProductQuality where  FMaterialNumber in (select FMaterialNumber  from rds_t_ProductQuality_input)
 
              ")
 

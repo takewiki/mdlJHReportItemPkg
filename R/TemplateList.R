@@ -51,14 +51,35 @@ TemplateList_inputdelete<- function(erp_token) {
 
   sql=paste0("
 
-delete from  rds_t_TemplateList_input where FTemplateNumber='' or FTemplateNumber is null or FTemplateNumber in (select FTemplateNumber  from rds_t_TemplateList)
 
-
+ delete from  rds_t_TemplateList_input where FTemplateNumber='' or FTemplateNumber is null
              ")
 
   res=tsda::sql_delete2(token = erp_token,sql_str = sql )
   return(res)
 }
+
+#' 覆盖前删除
+#'
+#' @param erp_token
+
+#' @return 无返回值
+#' @export
+#'
+#' @examples
+#' TemplateList_delete()
+TemplateList_delete<- function(erp_token) {
+
+  sql=paste0("
+
+
+ delete from  rds_t_TemplateList where  FTemplateNumber in (select FTemplateNumber  from rds_t_TemplateList_input)
+             ")
+
+  res=tsda::sql_delete2(token = erp_token,sql_str = sql )
+  return(res)
+}
+
 
 
 #' 删除模板清单为空
