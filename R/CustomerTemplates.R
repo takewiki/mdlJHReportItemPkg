@@ -78,10 +78,9 @@ CustomerTemplates_inputdelete<- function(erp_token) {
 CustomerTemplates_delete<- function(erp_token) {
 
   sql=paste0("
-
-delete a from  rds_t_CustomerTemplates A INNER JOIN rds_t_CustomerTemplates_input B
- ON A.FTemplateNumber=B.FTemplateNumber and a.FCustomerNumber=b.FCustomerNumber
- where  A.FTemplateNumber=B.FTemplateNumber and a.FCustomerNumber=b.FCustomerNumber
+ delete a from  rds_t_CustomerTemplates A INNER JOIN rds_t_CustomerTemplates_input B
+ ON A.FTemplateNumber=B.FTemplateNumber and a.FCustomerNumber=b.FCustomerNumber and a.FOrgName=b.FOrgName and a.FSaleDepartment =b.FSaleDepartment
+ where  A.FTemplateNumber=B.FTemplateNumber and a.FCustomerNumber=b.FCustomerNumber and a.FOrgName=b.FOrgName and a.FSaleDepartment =b.FSaleDepartment
 
              ")
 
