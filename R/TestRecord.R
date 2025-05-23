@@ -70,14 +70,37 @@ TestRecord_inputdelete<- function(erp_token) {
 
   sql=paste0("
 
-delete from  rds_t_TestRecord_input where Flot='' or Flot is null or Flot in (select Flot  from rds_t_TestRecord)
 
+ delete from  rds_t_TestRecord_input where Flot='' or Flot is null
 
              ")
 
   res=tsda::sql_delete2(token = erp_token,sql_str = sql )
   return(res)
 }
+
+#' 覆盖前删除
+#'
+#' @param erp_token
+
+#' @return 无返回值
+#' @export
+#'
+#' @examples
+#' TestRecord_delete()
+TestRecord_delete<- function(erp_token) {
+
+  sql=paste0("
+
+
+ delete from  rds_t_TestRecord where Flot in (select Flot  from rds_t_TestRecord_input)
+
+             ")
+
+  res=tsda::sql_delete2(token = erp_token,sql_str = sql )
+  return(res)
+}
+
 
 
 #' 删除检测记录为空

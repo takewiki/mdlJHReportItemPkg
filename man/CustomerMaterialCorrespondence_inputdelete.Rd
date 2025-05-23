@@ -2,7 +2,7 @@
 % Please edit documentation in R/CustomerMaterialCorrespondence.R
 \name{CustomerMaterialCorrespondence_inputdelete}
 \alias{CustomerMaterialCorrespondence_inputdelete}
-\title{删除客户物料对应为空}
+\title{删除客户为空}
 \usage{
 CustomerMaterialCorrespondence_inputdelete(erp_token)
 }
@@ -10,7 +10,7 @@ CustomerMaterialCorrespondence_inputdelete(erp_token)
 无返回值
 }
 \description{
-删除客户物料对应为空
+删除客户为空
 }
 \examples{
 CustomerMaterialCorrespondence_inputdelete()

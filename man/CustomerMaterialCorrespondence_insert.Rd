@@ -2,7 +2,7 @@
 % Please edit documentation in R/CustomerMaterialCorrespondence.R
 \name{CustomerMaterialCorrespondence_insert}
 \alias{CustomerMaterialCorrespondence_insert}
-\title{删除客户物料对应为空}
+\title{插入正式表}
 \usage{
 CustomerMaterialCorrespondence_insert(erp_token)
 }
@@ -10,7 +10,7 @@ CustomerMaterialCorrespondence_insert(erp_token)
 无返回值
 }
 \description{
-删除客户物料对应为空
+插入正式表
 }
 \examples{
 CustomerMaterialCorrespondence_insert()

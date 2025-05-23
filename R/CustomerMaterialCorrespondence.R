@@ -52,7 +52,7 @@ TRUNCATE TABLE rds_t_CustomerMaterialCorrespondence_input ")
 }
 
 
-#' 删除客户物料对应为空
+#' 删除客户为空
 #'
 #' @param erp_token
 
@@ -64,10 +64,8 @@ TRUNCATE TABLE rds_t_CustomerMaterialCorrespondence_input ")
 CustomerMaterialCorrespondence_inputdelete<- function(erp_token) {
 
   sql=paste0("
-  delete b FROM rds_t_CustomerMaterialCorrespondence A
- INNER JOIN rds_t_CustomerMaterialCorrespondence_INPUT b
- ON A.FCustomerNumber=B.FCustomerNumber AND A.FProductNumber=B.FProductNumber
- where b.FCustomerNumber='' or b.FProductNumber='' or ( A.FCustomerNumber=B.FCustomerNumber AND A.FProductNumber=B.FProductNumber)
+
+ delete from rds_t_CustomerMaterialCorrespondence_INPUT where FCustomerNumber=''
 
              ")
 
@@ -76,7 +74,32 @@ CustomerMaterialCorrespondence_inputdelete<- function(erp_token) {
 }
 
 
-#' 删除客户物料对应为空
+#' 删除覆盖前删除
+#'
+#' @param erp_token
+
+#' @return 无返回值
+#' @export
+#'
+#' @examples
+#' CustomerMaterialCorrespondence_delete()
+CustomerMaterialCorrespondence_delete<- function(erp_token) {
+
+  sql=paste0("
+
+  delete a FROM rds_t_CustomerMaterialCorrespondence A
+ INNER JOIN rds_t_CustomerMaterialCorrespondence_INPUT b
+ ON A.FCustomerNumber=B.FCustomerNumber AND A.FProductNumber=B.FProductNumber
+ where  A.FCustomerNumber=B.FCustomerNumber AND A.FProductNumber=B.FProductNumber
+
+             ")
+
+  res=tsda::sql_delete2(token = erp_token,sql_str = sql )
+  return(res)
+}
+
+
+#' 插入正式表
 #'
 #' @param erp_token
 
