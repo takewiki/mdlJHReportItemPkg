@@ -65,13 +65,18 @@ coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',output
   sql = paste0("select FBillNo  from rds_erp_coa_vw_sal_outStock_task")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   ncount = nrow(data)
+  res = 0
   if(ncount){
+
     for (i in 1:ncount) {
       FBillNo = data$FBillNo[i]
-      coa_pdf(erpToken = erpToken,FBillNo = FBillNo,outputDir = outputDir,delete_localFiles = delete_localFiles)
+      step = coa_pdf(erpToken = erpToken,FBillNo = FBillNo,outputDir = outputDir,delete_localFiles = delete_localFiles)
+
+      res = res + step
 
     }
   }
+  return (res)
 
 }
 #' 获取客户名称
@@ -188,6 +193,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
     template_coa = coa_GetTemplateNumber(erpToken = erpToken,FBillNo = FBillNo)
     if(is.null(template_coa)){
       print(paste0("销售出库单",FBillNo,"模板号为空，请及时维护"))
+      res = 0
     }else{
       print(2)
       #进一步处理
@@ -304,11 +310,16 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           }
           #end line
 
+          res = 1
+
 
 
 
         }
 
+      }
+      else{
+        res = 0
       }
 
 
@@ -320,7 +331,10 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
 
   }else{
     #任务不在COA任务中，不需要进行处理
+    res = 0
   }
+
+  return (res)
 
 }
 
