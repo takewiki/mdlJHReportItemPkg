@@ -137,7 +137,7 @@ where FBillNo = '",FBillNo,"' ")
 #'
 #' @param erpToken ERP口令
 #' @param FTemplateNumber 模板号
-#' @param FTableType 数据类型
+#' @param FCOATableType 数据类型
 #'
 #' @return 返回值
 #' @export
@@ -146,9 +146,9 @@ where FBillNo = '",FBillNo,"' ")
 #' coa_meta()
 coa_meta <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',
                      FTemplateNumber ='M001_100_IMP' ,
-                     FTableType ='billHead') {
+                     FCOATableType ='billHead') {
   sql = paste0("select FName_ERP_en,FTableName,FCells from [rds_t_ReportConfiguration]
-where   FTemplateNumber ='",FTemplateNumber,"' and FTableType ='",FTableType,"'")
+where   FTemplateNumber ='",FTemplateNumber,"' and FCOATableType ='",FCOATableType,"'")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   return(data)
 
@@ -217,21 +217,24 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
     }else{
       print(2)
       #进一步处理
-      meta_head = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FTableType = 'billHead')
+      meta_head = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FCOATableType = 'billHead')
       ncount_meta_head = nrow(meta_head)
       fields_head = paste0(meta_head$FName_ERP_en,collapse = " , ")
       table_head = meta_head$FTableName[1]
       sql_head = paste0("select  ",fields_head,"   from  ",table_head," where FBillNo  = '",FBillNo,"' ")
       data_head =  tsda::sql_select2(token = erpToken,sql = sql_head)
       ncount_head = nrow(data_head)
-
-      meta_entry = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FTableType = 'billEntry')
+      meta_entry = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FCOATableType = 'billEntry')
       ncount_meta_entry = nrow(meta_entry)
       fields_entry = paste0(meta_entry$FName_ERP_en,collapse = " , ")
       table_entry = meta_entry$FTableName[1]
       sql_entry = paste0("select  ",fields_entry,"   from  ",table_entry," where FBillNo  = '",FBillNo,"' ")
       data_entry =  tsda::sql_select2(token = erpToken,sql = sql_entry)
       ncount_entry = nrow(data_entry)
+
+
+
+
       if(ncount_head){
         print(3)
         #表头存在数据
@@ -246,6 +249,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             #针对数据处理处理
             field_head = meta_head$FName_ERP_en[i]
             cell_head  = meta_head$FCells[i]
+            print(cell_head)
             if (field_head == 'F_RDS_COA_IssueDate'| field_head =='F_RDS_COA_ShipDate'){
               #针对日期字段进行处理，去掉时间部分
               cellData_head = tsdo::left(as.character(data_head[1,field_head]),10)
@@ -263,7 +267,8 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             print('*******************debug*******************************')
             print(paste0("cellData:",cellData_head,"row:",indexRow,"col:",indexCol))
             openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_head,
-                                startCol = indexCol, startRow = indexRow, colNames = FALSE)
+                                startCol = indexCol, startRow = indexRow, colNames = FALSE,
+                                borders = "all" )
 
           }
 
@@ -273,6 +278,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           for (j in 1:ncount_meta_entry) {
             fields_entry = meta_entry$FName_ERP_en[j]
             cell_entry = meta_entry$FCells[j]
+            print(cell_entry)
             cellIndex_entry = excel_coord_to_numeric(cell_entry)
             for (k in 1:ncount_entry) {
               cellData_entry = data_entry[k ,fields_entry]
