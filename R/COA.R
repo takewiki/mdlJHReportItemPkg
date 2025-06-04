@@ -267,9 +267,19 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             print(indexRow)
             print('*******************debug*******************************')
             print(paste0("cellData:",cellData_head,"row:",indexRow,"col:",indexCol))
+
+            style_header <- createStyle(
+              fontName = "Calibri",    # 字体名称
+              fontSize = 10,           # 字号
+              halign = "center",       # 水平居中
+              valign = "center",       # 垂直居中
+            )
+
+
             openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_head,
                                 startCol = indexCol, startRow = indexRow, colNames = FALSE,
-                                borders = "all" )
+                                borders = "all" ,
+                                headerStyle = style_header)
 
           }
 
