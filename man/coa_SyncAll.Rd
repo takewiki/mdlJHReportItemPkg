@@ -7,7 +7,7 @@
 coa_SyncAll(
   erpToken = "C0426D23-1927-4314-8736-A74B2EF7A039",
   outputDir = getwd(),
-  delete_localFiles = 1
+  delete_localFiles = 0
 )
 }
 \arguments{

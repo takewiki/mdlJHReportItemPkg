@@ -61,7 +61,7 @@ order by FDATE")
 #'
 #' @examples
 #' coa_TaskToSync()
-coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',outputDir = getwd(), delete_localFiles = 1) {
+coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',outputDir = getwd(), delete_localFiles = 0) {
   sql = paste0("select FBillNo  from rds_erp_coa_vw_sal_outStock_task")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   ncount = nrow(data)
@@ -202,7 +202,7 @@ excel_coord_to_numeric <- function(coord) {
 #' @examples
 #' coa_pdf()
 coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo = "XSCKD-100-20250523-0001",
-                    outputDir = getwd(), delete_localFiles = 1)
+                    outputDir = getwd(), delete_localFiles = 0)
 {
   flag_new = coa_IsNew(erpToken = erpToken,FBillNo=FBillNo)
   print(flag_new)
@@ -268,20 +268,22 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             print('*******************debug*******************************')
             print(paste0("cellData:",cellData_head,"row:",indexRow,"col:",indexCol))
 
-            style_header <- createStyle(
-              fontName = "Calibri",    # 字体名称
-              fontSize = 10,           # 字号
+            header_style <- createStyle(
+              fontName = "Calibri",
+              fontSize = 10,
               halign = "center",       # 水平居中
               valign = "center",       # 垂直居中
+
             )
 
 
             openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_head,
                                 startCol = indexCol, startRow = indexRow, colNames = FALSE,
-                                borders = "all" ,
-                                headerStyle = style_header)
+                                #borders = "all" ,
+                                headerStyle = header_style )
 
           }
+
 
 
           print(4)
