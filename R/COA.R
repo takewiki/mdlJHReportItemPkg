@@ -222,6 +222,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
       fields_head = paste0(meta_head$FName_ERP_en,collapse = " , ")
       table_head = meta_head$FTableName[1]
       sql_head = paste0("select  ",fields_head,"   from  ",table_head," where FBillNo  = '",FBillNo,"' ")
+
       data_head =  tsda::sql_select2(token = erpToken,sql = sql_head)
       ncount_head = nrow(data_head)
       meta_entry = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FCOATableType = 'billEntry')
@@ -295,20 +296,31 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
 
           #处理文件名生成EXCEL
           print(5)
+
+          # 生成文件名
           FCumstoerName = coa_GetCustomerName(erpToken = erpToken,FBillNo = FBillNo)
-          print(FCumstoerName)
+
           FDate=coa_GetFDate(erpToken = erpToken,FBillNo = FBillNo)
-          print(FDate)
+
           #outputFile = paste0("COA_",FBillNo, "_", FCumstoerName,".xlsx")
+          # 在生成文件名时替换空格
+          clean_name <- function(text) {
+            text <- gsub("\\s+", "_", text)  # 将所有空格替换为下划线
+            gsub('[\\\\/:*?"<>|]', "_", text)  # 替换其他非法字符
+          }
 
-          FCumstoerName_six <- substr(FCumstoerName, 1, 6)
-          print(FCumstoerName_six)
-          FBillNo_productName <- sub(".*@", "", FBillNo)
+          FCumstoerName_six <- clean_name(substr(FCumstoerName, 1, 6))
+          FBillNo_productName <- clean_name(sub(".*@", "", FBillNo))
+
+          # FCumstoerName_six <- substr(FCumstoerName, 1, 6)
+          # FBillNo_productName <- sub(".*@", "", FBillNo)
           print(FBillNo_productName)
-          outputFile = paste0("COA_", FCumstoerName_six, "_", FBillNo_productName, "_", FDate,".xlsx")
-
+          outputFile = paste0("COA_",FCumstoerName_six,"_",FBillNo_productName,"_",FDate,".xlsx")
+          outputFile <- gsub("[()]", "", outputFile)
           #pdf_base_name = paste0("COA_",FBillNo, "_", FCumstoerName,".pdf")
-          pdf_base_name = paste0("COA_", FCumstoerName_six, "_", FBillNo_productName, "_", FDate,".pdf")
+          pdf_base_name = paste0("COA_",FCumstoerName_six, "_",FBillNo_productName,"_",FDate,".pdf")
+
+          pdf_base_name <- gsub("[()]", "", pdf_base_name)
           xlsx_file_name = paste0(outputDir, "/", outputFile)
           print(xlsx_file_name)
           pdf_full_name = paste0(outputDir, "/", pdf_base_name)
