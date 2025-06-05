@@ -61,7 +61,7 @@ order by FDATE")
 #'
 #' @examples
 #' coa_TaskToSync()
-coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',outputDir = getwd(), delete_localFiles = 1) {
+coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',outputDir = getwd(), delete_localFiles = 0) {
   sql = paste0("select FBillNo  from rds_erp_coa_vw_sal_outStock_task")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   ncount = nrow(data)
@@ -112,12 +112,32 @@ order by FDATE")
 
 }
 
+#' 获取日期
+#'
+#' @param erpToken ERP口令
+#' @param FBillNo 单据编号
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' coa_GetFDate()
+coa_GetFDate <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo = "XSCKD-102-20250521-0004") {
+  sql = paste0("select cast(fdate as date) as FDate  from rds_erp_coa_vw_sal_outStock_task
+where FBillNo = '",FBillNo,"' ")
+  res = tsda::sql_select2(token = erpToken,sql = sql)
+
+  return(res)
+
+}
+
+
 
 #' 返回元数据信息
 #'
 #' @param erpToken ERP口令
 #' @param FTemplateNumber 模板号
-#' @param FTableType 数据类型
+#' @param FCOATableType 数据类型
 #'
 #' @return 返回值
 #' @export
@@ -126,9 +146,9 @@ order by FDATE")
 #' coa_meta()
 coa_meta <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',
                      FTemplateNumber ='M001_100_IMP' ,
-                     FTableType ='billHead') {
+                     FCOATableType ='billHead') {
   sql = paste0("select FName_ERP_en,FTableName,FCells from [rds_t_ReportConfiguration]
-where   FTemplateNumber ='",FTemplateNumber,"' and FTableType ='",FTableType,"'")
+where   FTemplateNumber ='",FTemplateNumber,"' and FCOATableType ='",FCOATableType,"'")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   return(data)
 
@@ -182,7 +202,7 @@ excel_coord_to_numeric <- function(coord) {
 #' @examples
 #' coa_pdf()
 coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo = "XSCKD-100-20250523-0001",
-          outputDir = getwd(), delete_localFiles = 1)
+                    outputDir = getwd(), delete_localFiles = 0)
 {
   flag_new = coa_IsNew(erpToken = erpToken,FBillNo=FBillNo)
   print(flag_new)
@@ -197,21 +217,25 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
     }else{
       print(2)
       #进一步处理
-      meta_head = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FTableType = 'billHead')
+      meta_head = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FCOATableType = 'billHead')
       ncount_meta_head = nrow(meta_head)
       fields_head = paste0(meta_head$FName_ERP_en,collapse = " , ")
       table_head = meta_head$FTableName[1]
       sql_head = paste0("select  ",fields_head,"   from  ",table_head," where FBillNo  = '",FBillNo,"' ")
+
       data_head =  tsda::sql_select2(token = erpToken,sql = sql_head)
       ncount_head = nrow(data_head)
-
-      meta_entry = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FTableType = 'billEntry')
+      meta_entry = coa_meta(erpToken = erpToken ,FTemplateNumber = template_coa,FCOATableType = 'billEntry')
       ncount_meta_entry = nrow(meta_entry)
       fields_entry = paste0(meta_entry$FName_ERP_en,collapse = " , ")
       table_entry = meta_entry$FTableName[1]
       sql_entry = paste0("select  ",fields_entry,"   from  ",table_entry," where FBillNo  = '",FBillNo,"' ")
       data_entry =  tsda::sql_select2(token = erpToken,sql = sql_entry)
       ncount_entry = nrow(data_entry)
+
+
+
+
       if(ncount_head){
         print(3)
         #表头存在数据
@@ -223,14 +247,15 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           excel_file <- openxlsx::loadWorkbook(templateFile)
           #写入表头数据
           for ( i in 1:ncount_meta_head) {
-             #针对数据处理处理
+            #针对数据处理处理
             field_head = meta_head$FName_ERP_en[i]
             cell_head  = meta_head$FCells[i]
+            print(cell_head)
             if (field_head == 'F_RDS_COA_IssueDate'| field_head =='F_RDS_COA_ShipDate'){
               #针对日期字段进行处理，去掉时间部分
               cellData_head = tsdo::left(as.character(data_head[1,field_head]),10)
             }else{
-               cellData_head = as.character(data_head[1,field_head])
+              cellData_head = as.character(data_head[1,field_head])
             }
 
 
@@ -242,10 +267,23 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             print(indexRow)
             print('*******************debug*******************************')
             print(paste0("cellData:",cellData_head,"row:",indexRow,"col:",indexCol))
+
+            header_style <- createStyle(
+              fontName = "Calibri",
+              fontSize = 10,
+              halign = "center",       # 水平居中
+              valign = "center",       # 垂直居中
+
+            )
+
+
             openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_head,
-                                       startCol = indexCol, startRow = indexRow, colNames = FALSE)
+                                startCol = indexCol, startRow = indexRow, colNames = FALSE,
+                                #borders = "all" ,
+                                headerStyle = header_style )
 
           }
+
 
 
           print(4)
@@ -253,6 +291,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           for (j in 1:ncount_meta_entry) {
             fields_entry = meta_entry$FName_ERP_en[j]
             cell_entry = meta_entry$FCells[j]
+            print(cell_entry)
             cellIndex_entry = excel_coord_to_numeric(cell_entry)
             for (k in 1:ncount_entry) {
               cellData_entry = data_entry[k ,fields_entry]
@@ -269,9 +308,31 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
 
           #处理文件名生成EXCEL
           print(5)
+
+          # 生成文件名
           FCumstoerName = coa_GetCustomerName(erpToken = erpToken,FBillNo = FBillNo)
-          outputFile = paste0("COA_",FBillNo, "_", FCumstoerName,".xlsx")
-          pdf_base_name = paste0("COA_",FBillNo, "_", FCumstoerName,".pdf")
+
+          FDate=coa_GetFDate(erpToken = erpToken,FBillNo = FBillNo)
+
+          #outputFile = paste0("COA_",FBillNo, "_", FCumstoerName,".xlsx")
+          # 在生成文件名时替换空格
+          clean_name <- function(text) {
+            text <- gsub("\\s+", "_", text)  # 将所有空格替换为下划线
+            gsub('[\\\\/:*?"<>|]', "_", text)  # 替换其他非法字符
+          }
+
+          FCumstoerName_six <- clean_name(substr(FCumstoerName, 1, 6))
+          FBillNo_productName <- clean_name(sub(".*@", "", FBillNo))
+
+          # FCumstoerName_six <- substr(FCumstoerName, 1, 6)
+          # FBillNo_productName <- sub(".*@", "", FBillNo)
+          print(FBillNo_productName)
+          outputFile = paste0("COA_",FCumstoerName_six,"_",FBillNo_productName,"_",FDate,".xlsx")
+          outputFile <- gsub("[()]", "", outputFile)
+          #pdf_base_name = paste0("COA_",FBillNo, "_", FCumstoerName,".pdf")
+          pdf_base_name = paste0("COA_",FCumstoerName_six, "_",FBillNo_productName,"_",FDate,".pdf")
+
+          pdf_base_name <- gsub("[()]", "", pdf_base_name)
           xlsx_file_name = paste0(outputDir, "/", outputFile)
           print(xlsx_file_name)
           pdf_full_name = paste0(outputDir, "/", pdf_base_name)
@@ -289,16 +350,29 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           type = "jhcoa"
           #上传excel
           Url_excel = mdlOssr::rdOssFile_upload(dmsToken = dms_token,
-                                              ossToken = oss_token, type = type, baseName = outputFile,
-                                              fullName = xlsx_file_name)
+                                                ossToken = oss_token, type = type, baseName = outputFile,
+                                                fullName = xlsx_file_name)
 
           Url_pdf = mdlOssr::rdOssFile_upload(dmsToken = dms_token,
                                               ossToken = oss_token, type = type, baseName = pdf_base_name,
                                               fullName = pdf_full_name)
           #print(fileUrl)
-          sql_oss = paste0("update a set   F_QH_QualityReport =1,F_RDS_RPA=1,F_NLJ_COA_XLSX ='",Url_excel,"',F_NLJ_COA_PDF='",Url_pdf,"'
+          # sql_oss = paste0("update a set   F_QH_QualityReport =1,F_RDS_RPA=1,F_NLJ_COA_XLSX ='",Url_excel,"',F_NLJ_COA_PDF='",Url_pdf,"'
+          #         from t_sal_outStock a
+          #         where FBILLNO ='",FBillNo,"'")
+
+
+          # sql_oss = paste0("update a set   F_QH_QualityReport =1,F_RDS_RPA=1,F_NLJ_COA_XLSX ='",Url_excel,"',F_NLJ_COA_PDF='",Url_pdf,"'
+          #         from t_sal_outStock a
+          #         where   CHARINDEX(A.FBILLNO, '",FBillNo,"') > 0 ")
+
+
+          sql_oss = paste0("update B set   F_RDS_QH_QualityReport =1,F_RDS_COA_XLSX ='",Url_excel,"',F_RDS_COA_PDF='",Url_pdf,"'
                   from t_sal_outStock a
-                  where FBILLNO ='",FBillNo,"'")
+				  INNER JOIN T_SAL_OUTSTOCKENTRY B ON A.FID=B.FID
+                   where CONCAT(a.FBILLNO,'@',B.F_RDS_COA_ProductName) ='",FBillNo,"'")
+
+
           tsda::sql_update2(token = erpToken, sql_str = sql_oss)
           if (delete_localFiles) {
             if (file.exists(xlsx_file_name)) {

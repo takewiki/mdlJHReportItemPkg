@@ -7,7 +7,7 @@
 coa_meta(
   erpToken = "C0426D23-1927-4314-8736-A74B2EF7A039",
   FTemplateNumber = "M001_100_IMP",
-  FTableType = "billHead"
+  FCOATableType = "billHead"
 )
 }
 \arguments{
@@ -15,7 +15,7 @@ coa_meta(
 
 \item{FTemplateNumber}{模板号}
 
-\item{FTableType}{数据类型}
+\item{FCOATableType}{数据类型}
 }
 \value{
 返回值
