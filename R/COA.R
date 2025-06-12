@@ -298,20 +298,35 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             for (k in 1:ncount_entry) {
               cellData_entry = data_entry[k ,fields_entry]
 
+              print('表体数据写入')
               print(cellData_entry)
+              # print(cellIndex_entry['col'])
+              # print(cellIndex_entry['row'] + k -1)
+              # print(cellIndex_entry['col']+k-1)
+              # print(cellIndex_entry['row'])
               cellIndex_entry = excel_coord_to_numeric(cell_entry)
+              print(template_coa)
+              if(template_coa=='M021'){
+                openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
+                                    startCol = cellIndex_entry['col']+k-1,
+                                    startRow = cellIndex_entry['row'] ,
+                                    colNames = FALSE)
 
-              openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
-                                  startCol = cellIndex_entry['col'],
-                                  startRow = cellIndex_entry['row'] + k -1,
-                                  colNames = FALSE)
+              }else{
+                openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
+                                    startCol = cellIndex_entry['col'],
+                                    startRow = cellIndex_entry['row'] + k -1,
+                                    colNames = FALSE)
 
-
+              }
 
 
 
 
             }
+
+
+
 
 
           }

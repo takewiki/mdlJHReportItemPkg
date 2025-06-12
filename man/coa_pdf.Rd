@@ -8,7 +8,7 @@ coa_pdf(
   erpToken = "C0426D23-1927-4314-8736-A74B2EF7A039",
   FBillNo = "XSCKD-100-20250523-0001",
   outputDir = getwd(),
-  delete_localFiles = 1
+  delete_localFiles = 0
 )
 }
 \arguments{
