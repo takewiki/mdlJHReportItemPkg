@@ -251,12 +251,13 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             field_head = meta_head$FName_ERP_en[i]
             cell_head  = meta_head$FCells[i]
             print(cell_head)
-            if (field_head == 'F_RDS_COA_IssueDate'| field_head =='F_RDS_COA_ShipDate'){
-              #针对日期字段进行处理，去掉时间部分
-              cellData_head = tsdo::left(as.character(data_head[1,field_head]),10)
-            }else{
-              cellData_head = as.character(data_head[1,field_head])
-            }
+            cellData_head = as.character(data_head[1,field_head])
+            # if (field_head == 'F_RDS_COA_IssueDate'| field_head =='F_RDS_COA_ShipDate'){
+            #   #针对日期字段进行处理，去掉时间部分
+            #   cellData_head = tsdo::left(as.character(data_head[1,field_head]),10)
+            # }else{
+            #   cellData_head = as.character(data_head[1,field_head])
+            # }
 
 
             print(cellData_head)
@@ -274,13 +275,17 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
               halign = "center",       # 水平居中
               valign = "center",       # 垂直居中
 
+
             )
 
 
             openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_head,
-                                startCol = indexCol, startRow = indexRow, colNames = FALSE,
+                                startCol = indexCol, startRow = indexRow,
+                                #colNames = FALSE,
                                 #borders = "all" ,
                                 headerStyle = header_style )
+
+
 
           }
 
@@ -296,11 +301,37 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             for (k in 1:ncount_entry) {
               cellData_entry = data_entry[k ,fields_entry]
 
+              print('表体数据写入')
               print(cellData_entry)
+              # print(cellIndex_entry['col'])
+              # print(cellIndex_entry['row'] + k -1)
+              # print(cellIndex_entry['col']+k-1)
+              # print(cellIndex_entry['row'])
               cellIndex_entry = excel_coord_to_numeric(cell_entry)
-              openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
-                                  startCol = cellIndex_entry['col'], startRow = cellIndex_entry['row'] + k -1, colNames = FALSE)
+              print(template_coa)
+              if(template_coa=='M021'){
+                openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
+                                    startCol = cellIndex_entry['col']+k-1,
+                                    startRow = cellIndex_entry['row'] ,
+                                    colNames = FALSE)
+
+              }else{
+                openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
+                                    startCol = cellIndex_entry['col'],
+                                    startRow = cellIndex_entry['row'] + k -1,
+                                    colNames = FALSE)
+
+
+
+              }
+
+
+
+
             }
+
+
+
 
 
           }
@@ -323,14 +354,13 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
 
           FCumstoerName_six <- clean_name(substr(FCumstoerName, 1, 6))
           FBillNo_productName <- clean_name(sub(".*@", "", FBillNo))
-
-          # FCumstoerName_six <- substr(FCumstoerName, 1, 6)
-          # FBillNo_productName <- sub(".*@", "", FBillNo)
+          FBillNo_no <- sub("@.*", "", FBillNo)
+          #FBillNo_no = substr(FBillNo_no, 15, 23)
           print(FBillNo_productName)
-          outputFile = paste0("COA_",FCumstoerName_six,"_",FBillNo_productName,"_",FDate,".xlsx")
+          outputFile = paste0("COA_",FCumstoerName_six,"_",FBillNo_productName,"_",FDate,"_",FBillNo_no,".xlsx")
           outputFile <- gsub("[()]", "", outputFile)
           #pdf_base_name = paste0("COA_",FBillNo, "_", FCumstoerName,".pdf")
-          pdf_base_name = paste0("COA_",FCumstoerName_six, "_",FBillNo_productName,"_",FDate,".pdf")
+          pdf_base_name = paste0("COA_",FCumstoerName_six, "_",FBillNo_productName,"_",FDate,"_",FBillNo_no,".pdf")
 
           pdf_base_name <- gsub("[()]", "", pdf_base_name)
           xlsx_file_name = paste0(outputDir, "/", outputFile)
@@ -338,8 +368,9 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           pdf_full_name = paste0(outputDir, "/", pdf_base_name)
           saveWorkbook(excel_file, xlsx_file_name, overwrite = TRUE)
           #生成PDF
+
           cmd = paste0("libreoffice --headless --convert-to pdf --outdir ",
-                       outputDir, "  ", xlsx_file_name)
+                         outputDir, "  ", xlsx_file_name)
           Sys.setenv(LD_LIBRARY_PATH = paste("/usr/lib/libreoffice/program",
                                              Sys.getenv("LD_LIBRARY_PATH"), sep = ":"))
           system(cmd)
@@ -370,7 +401,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           sql_oss = paste0("update B set   F_RDS_QH_QualityReport =1,F_RDS_COA_XLSX ='",Url_excel,"',F_RDS_COA_PDF='",Url_pdf,"'
                   from t_sal_outStock a
 				  INNER JOIN T_SAL_OUTSTOCKENTRY B ON A.FID=B.FID
-                   where CONCAT(a.FBILLNO,'@',B.F_RDS_COA_ProductName) ='",FBillNo,"'")
+                   where CONCAT(a.FBILLNO,'@',B.F_RDS_COA_ProductName,'_',F_RDS_COA_PageNumber) ='",FBillNo,"'")
 
 
           tsda::sql_update2(token = erpToken, sql_str = sql_oss)
