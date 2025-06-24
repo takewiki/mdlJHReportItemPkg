@@ -275,6 +275,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
               halign = "center",       # 水平居中
               valign = "center",       # 垂直居中
 
+
             )
 
 
@@ -283,6 +284,8 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
                                 #colNames = FALSE,
                                 #borders = "all" ,
                                 headerStyle = header_style )
+
+
 
           }
 
@@ -318,6 +321,8 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
                                     startRow = cellIndex_entry['row'] + k -1,
                                     colNames = FALSE)
 
+
+
               }
 
 
@@ -350,14 +355,12 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           FCumstoerName_six <- clean_name(substr(FCumstoerName, 1, 6))
           FBillNo_productName <- clean_name(sub(".*@", "", FBillNo))
           FBillNo_no <- sub("@.*", "", FBillNo)
-
-          # FCumstoerName_six <- substr(FCumstoerName, 1, 6)
-          # FBillNo_productName <- sub(".*@", "", FBillNo)
+          #FBillNo_no = substr(FBillNo_no, 15, 23)
           print(FBillNo_productName)
-          outputFile = paste0("COA_",FCumstoerName_six,"_",FBillNo_productName,"_",FBillNo_no,"_",FDate,".xlsx")
+          outputFile = paste0("COA_",FCumstoerName_six,"_",FBillNo_productName,"_",FDate,"_",FBillNo_no,".xlsx")
           outputFile <- gsub("[()]", "", outputFile)
           #pdf_base_name = paste0("COA_",FBillNo, "_", FCumstoerName,".pdf")
-          pdf_base_name = paste0("COA_",FCumstoerName_six, "_",FBillNo_productName,"_",FBillNo_no,"_",FDate,".pdf")
+          pdf_base_name = paste0("COA_",FCumstoerName_six, "_",FBillNo_productName,"_",FDate,"_",FBillNo_no,".pdf")
 
           pdf_base_name <- gsub("[()]", "", pdf_base_name)
           xlsx_file_name = paste0(outputDir, "/", outputFile)
@@ -365,8 +368,9 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           pdf_full_name = paste0(outputDir, "/", pdf_base_name)
           saveWorkbook(excel_file, xlsx_file_name, overwrite = TRUE)
           #生成PDF
+
           cmd = paste0("libreoffice --headless --convert-to pdf --outdir ",
-                       outputDir, "  ", xlsx_file_name)
+                         outputDir, "  ", xlsx_file_name)
           Sys.setenv(LD_LIBRARY_PATH = paste("/usr/lib/libreoffice/program",
                                              Sys.getenv("LD_LIBRARY_PATH"), sep = ":"))
           system(cmd)
