@@ -52,6 +52,31 @@ order by FDATE")
 
 }
 
+
+
+#' 获取COA表体走向
+#'
+#' @param erpToken ERP口令
+#' @param FTemplateNumber 单据编号
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
+#' coa_GetBodyDirection()
+coa_GetBodyDirection <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FTemplateNumber = "M021") {
+  sql = paste0("select FBodyDirection from rds_t_TemplateList where FTemplateNumber= '",FTemplateNumber,"'
+")
+  res = tsda::sql_select2(token = erpToken,sql = sql)
+
+
+  return(res)
+
+}
+
+
+
+
 #' 获取单据清单
 #'
 #' @param erpToken ERP 口令
@@ -309,7 +334,9 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
               # print(cellIndex_entry['row'])
               cellIndex_entry = excel_coord_to_numeric(cell_entry)
               print(template_coa)
-              if(template_coa=='M021'){
+              BodyDirection_coa = coa_GetBodyDirection(erpToken = erpToken,FTemplateNumber = template_coa)
+
+              if(BodyDirection_coa=='横向'){
                 openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
                                     startCol = cellIndex_entry['col']+k-1,
                                     startRow = cellIndex_entry['row'] ,
@@ -370,7 +397,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           #生成PDF
 
           cmd = paste0("libreoffice --headless --convert-to pdf --outdir ",
-                         outputDir, "  ", xlsx_file_name)
+                       outputDir, "  ", xlsx_file_name)
           Sys.setenv(LD_LIBRARY_PATH = paste("/usr/lib/libreoffice/program",
                                              Sys.getenv("LD_LIBRARY_PATH"), sep = ":"))
           system(cmd)

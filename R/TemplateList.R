@@ -11,8 +11,9 @@
 TemplateList_select<- function(erp_token) {
 
   sql=paste0("
-select FTemplateNumber as 模板编号,FTemplateName as 模板名称,FMaxEntrySeq as COA表体最大行数
-from rds_t_TemplateList")
+select FTemplateNumber as 模板编号,FTemplateName as 模板名称,FMaxEntrySeq as COA表体最大行数,FBodyDirection AS 表体走向
+from rds_t_TemplateList
+")
 
   res=tsda::sql_select2(token = erp_token,sql = sql)
   return(res)
