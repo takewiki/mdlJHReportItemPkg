@@ -12,6 +12,7 @@ ProductQuality_select<- function(erp_token) {
 
   sql=paste0("
 SELECT
+FCustomerName as 客户名称,
 FMaterialNumber	as	物料编码	,
 FViscosityTestMethods	as	粘度测试方法	,
 FViscosityUnit	as	粘度单位	,

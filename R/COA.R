@@ -87,6 +87,11 @@ coa_GetBodyDirection <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A03
 #' @examples
 #' coa_TaskToSync()
 coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',outputDir = getwd(), delete_localFiles = 0) {
+
+  sql_erp=paste0(" exec rds_proc_ReportItem_update")
+
+  res=tsda::sql_update2(token = erp_token,sql_str = sql_erp )
+  print('ERP字段同步成功')
   sql = paste0("select FBillNo  from rds_erp_coa_vw_sal_outStock_task")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   ncount = nrow(data)
@@ -335,8 +340,8 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
               cellIndex_entry = excel_coord_to_numeric(cell_entry)
               print(template_coa)
               BodyDirection_coa = coa_GetBodyDirection(erpToken = erpToken,FTemplateNumber = template_coa)
-
-              if(BodyDirection_coa=='横向'){
+              print(BodyDirection_coa)
+              if(grepl("横", BodyDirection_coa)){
                 openxlsx::writeData(wb = excel_file, sheet = "Sheet1", x = cellData_entry,
                                     startCol = cellIndex_entry['col']+k-1,
                                     startRow = cellIndex_entry['row'] ,
