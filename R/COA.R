@@ -294,10 +294,10 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             cellIndex_head =excel_coord_to_numeric(cell_head)
             indexCol = cellIndex_head['col']
             indexRow = cellIndex_head['row']
-            print(indexCol)
-            print(indexRow)
-            print('*******************debug*******************************')
-            print(paste0("cellData:",cellData_head,"row:",indexRow,"col:",indexCol))
+            # print(indexCol)
+            # print(indexRow)
+            # print('*******************debug*******************************')
+            # print(paste0("cellData:",cellData_head,"row:",indexRow,"col:",indexCol))
 
             header_style <- createStyle(
               fontName = "Calibri",
@@ -398,6 +398,22 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           xlsx_file_name = paste0(outputDir, "/", outputFile)
           print(xlsx_file_name)
           pdf_full_name = paste0(outputDir, "/", pdf_base_name)
+
+
+
+          # 2. 设置页面缩放至一页
+          current_sheet <- "Sheet1"
+          openxlsx::pageSetup(
+            wb = excel_file,
+            sheet = current_sheet,
+            orientation = "portrait",
+            paperSize = 9,      # 设置纸张为 A4 格式
+            fitToWidth = 1,     # 宽度缩放到1页
+            fitToHeight = 1     # 高度缩放到1页
+          )
+
+
+
           saveWorkbook(excel_file, xlsx_file_name, overwrite = TRUE)
           #生成PDF
 
