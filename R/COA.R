@@ -331,8 +331,8 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
             for (k in 1:ncount_entry) {
               cellData_entry = data_entry[k ,fields_entry]
 
-              print('表体数据写入')
-              print(cellData_entry)
+              # print('表体数据写入')
+              # print(cellData_entry)
               # print(cellIndex_entry['col'])
               # print(cellIndex_entry['row'] + k -1)
               # print(cellIndex_entry['col']+k-1)
@@ -387,11 +387,10 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           FCumstoerName_six <- clean_name(substr(FCumstoerName, 1, 6))
           FBillNo_productName <- clean_name(sub(".*@", "", FBillNo))
           FBillNo_no <- sub("@.*", "", FBillNo)
-          #FBillNo_no = substr(FBillNo_no, 15, 23)
-          print(FBillNo_productName)
+
           outputFile = paste0("COA_",FCumstoerName_six,"_",FBillNo_productName,"_",FDate,"_",FBillNo_no,".xlsx")
           outputFile <- gsub("[()]", "", outputFile)
-          #pdf_base_name = paste0("COA_",FBillNo, "_", FCumstoerName,".pdf")
+
           pdf_base_name = paste0("COA_",FCumstoerName_six, "_",FBillNo_productName,"_",FDate,"_",FBillNo_no,".pdf")
 
           pdf_base_name <- gsub("[()]", "", pdf_base_name)
@@ -400,17 +399,6 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           pdf_full_name = paste0(outputDir, "/", pdf_base_name)
 
 
-
-          # 2. 设置页面缩放至一页
-          current_sheet <- "Sheet1"
-          openxlsx::pageSetup(
-            wb = excel_file,
-            sheet = current_sheet,
-            orientation = "portrait",
-            paperSize = 9,      # 设置纸张为 A4 格式
-            fitToWidth = 1,     # 宽度缩放到1页
-            fitToHeight = 1     # 高度缩放到1页
-          )
 
 
 
