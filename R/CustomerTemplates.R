@@ -58,7 +58,9 @@ CustomerTemplates_inputdelete<- function(erp_token) {
   sql=paste0("
 
 
- delete from  rds_t_CustomerTemplates_input where FSeq='' or FSeq is null
+ delete from  rds_t_CustomerTemplates_input where FCustomerNumber='' or FCustomerNumber is null
+ or FOrgName='' or FOrgName is null   or a.FSaleDepartment='' or a.FSaleDepartment is null
+
 
              ")
 
@@ -79,8 +81,8 @@ CustomerTemplates_delete<- function(erp_token) {
 
   sql=paste0("
  delete a from  rds_t_CustomerTemplates A INNER JOIN rds_t_CustomerTemplates_input B
- ON A.FTemplateNumber=B.FTemplateNumber and a.FCustomerNumber=b.FCustomerNumber and a.FOrgName=b.FOrgName and a.FSaleDepartment =b.FSaleDepartment
- where  A.FTemplateNumber=B.FTemplateNumber and a.FCustomerNumber=b.FCustomerNumber and a.FOrgName=b.FOrgName and a.FSaleDepartment =b.FSaleDepartment
+ ON  a.FCustomerNumber=b.FCustomerNumber and a.FOrgName=b.FOrgName and a.FSaleDepartment =b.FSaleDepartment
+ where  a.FCustomerNumber=b.FCustomerNumber and a.FOrgName=b.FOrgName and a.FSaleDepartment =b.FSaleDepartment
 
              ")
 
