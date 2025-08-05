@@ -59,7 +59,7 @@ CustomerTemplates_inputdelete<- function(erp_token) {
 
 
  delete from  rds_t_CustomerTemplates_input where FCustomerNumber='' or FCustomerNumber is null
- or FOrgName='' or FOrgName is null   or a.FSaleDepartment='' or a.FSaleDepartment is null
+ or FOrgName='' or FOrgName is null   or FSaleDepartment='' or FSaleDepartment is null
 
 
              ")
