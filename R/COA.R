@@ -9,7 +9,7 @@
 #' @examples
 #' coa_IsNew()
 coa_IsNew <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo = "XSCKD-102-20250521-0004") {
-  sql = paste0("select F_RDS_COA_TEMPLATENUMBER  from rds_erp_coa_vw_sal_outStock_task
+  sql = paste0("select F_RDS_COA_TEMPLATENUMBER  from rds_erp_coa_vw_sal_deliveryNotice_task
 where FBillNo = '",FBillNo,"'
 order by FDATE")
   print(sql)
@@ -35,7 +35,7 @@ order by FDATE")
 #' @examples
 #' coa_GetTemplateNumber()
 coa_GetTemplateNumber <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo = "XSCKD-102-20250521-0004") {
-  sql = paste0("select F_RDS_COA_TEMPLATENUMBER  from rds_erp_coa_vw_sal_outStock_task
+  sql = paste0("select F_RDS_COA_TEMPLATENUMBER  from rds_erp_coa_vw_sal_deliveryNotice_task
 where FBillNo = '",FBillNo,"'
 order by FDATE")
   data = tsda::sql_select2(token = erpToken,sql = sql)
@@ -88,11 +88,11 @@ coa_GetBodyDirection <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A03
 #' coa_TaskToSync()
 coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',outputDir = getwd(), delete_localFiles = 0) {
 
-  sql_erp=paste0(" exec rds_proc_ReportItem_update")
+  sql_erp=paste0(" exec rds_proc_ReportItem_DELIVERYNOTICE_update")
 
   res=tsda::sql_update2(token = erp_token,sql_str = sql_erp )
   print('ERP字段同步成功')
-  sql = paste0("select FBillNo  from rds_erp_coa_vw_sal_outStock_task")
+  sql = paste0("select FBillNo  from rds_erp_coa_vw_sal_deliveryNotice_task")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   ncount = nrow(data)
   res = 0
@@ -120,7 +120,7 @@ coa_SyncAll <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',output
 #' @examples
 #' coa_GetCustomerName()
 coa_GetCustomerName <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo = "XSCKD-102-20250521-0004") {
-  sql = paste0("select FCustomerName  from rds_erp_coa_vw_sal_outStock_task
+  sql = paste0("select FCustomerName  from rds_erp_coa_vw_sal_deliveryNotice_task
 where FBillNo = '",FBillNo,"'
 order by FDATE")
   data = tsda::sql_select2(token = erpToken,sql = sql)
@@ -153,7 +153,7 @@ order by FDATE")
 #' @examples
 #' coa_GetFDate()
 coa_GetFDate <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo = "XSCKD-102-20250521-0004") {
-  sql = paste0("select cast(fdate as date) as FDate  from rds_erp_coa_vw_sal_outStock_task
+  sql = paste0("select cast(fdate as date) as FDate  from rds_erp_coa_vw_sal_deliveryNotice_task
 where FBillNo = '",FBillNo,"' ")
   res = tsda::sql_select2(token = erpToken,sql = sql)
 
@@ -424,19 +424,19 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
                                               fullName = pdf_full_name)
           #print(fileUrl)
           # sql_oss = paste0("update a set   F_QH_QualityReport =1,F_RDS_RPA=1,F_NLJ_COA_XLSX ='",Url_excel,"',F_NLJ_COA_PDF='",Url_pdf,"'
-          #         from t_sal_outStock a
+          #         from t_sal_deliveryNotice a
           #         where FBILLNO ='",FBillNo,"'")
 
 
           # sql_oss = paste0("update a set   F_QH_QualityReport =1,F_RDS_RPA=1,F_NLJ_COA_XLSX ='",Url_excel,"',F_NLJ_COA_PDF='",Url_pdf,"'
-          #         from t_sal_outStock a
+          #         from t_sal_deliveryNotice a
           #         where   CHARINDEX(A.FBILLNO, '",FBillNo,"') > 0 ")
 
 
           sql_oss = paste0("update B set   F_RDS_QH_QualityReport =1,F_RDS_COA_XLSX ='",Url_excel,"',F_RDS_COA_PDF='",Url_pdf,"'
-                  from t_sal_outStock a
-				  INNER JOIN T_SAL_OUTSTOCKENTRY B ON A.FID=B.FID
-                   where CONCAT(a.FBILLNO,'@',B.F_RDS_COA_ProductName,'_',F_RDS_COA_PageNumber) ='",FBillNo,"'")
+                  from t_sal_deliveryNotice a
+				  INNER JOIN T_SAL_deliveryNoticeENTRY B ON A.FID=B.FID
+                   where CONCAT(a.F_RDS_COA_ShipOrderNo,'@',B.F_RDS_COA_ProductName,'_',F_RDS_COA_PageNumber) ='",FBillNo,"'")
 
 
           tsda::sql_update2(token = erpToken, sql_str = sql_oss)
