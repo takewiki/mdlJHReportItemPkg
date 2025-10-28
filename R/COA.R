@@ -179,7 +179,10 @@ coa_meta <- function(erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039',
                      FTemplateNumber ='M001_100_IMP' ,
                      FCOATableType ='billHead') {
   sql = paste0("select FName_ERP_en,FTableName,FCells from [rds_t_ReportConfiguration]
-where   FTemplateNumber ='",FTemplateNumber,"' and FCOATableType ='",FCOATableType,"'")
+where   FTemplateNumber ='",FTemplateNumber,"' and FCOATableType ='",FCOATableType,"'
+AND  FTableName like '%sal_deliveryNotice%'
+
+               ")
   data = tsda::sql_select2(token = erpToken,sql = sql)
   return(data)
 
