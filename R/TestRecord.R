@@ -129,3 +129,40 @@ insert into rds_t_TestRecord select distinct * from rds_t_TestRecord_input
 
 
 
+#' 按日期查询COA记录
+#'
+#' @param token
+#' @param FDate
+
+#' @return 无返回值
+#' @export
+#'
+#' @examples
+#' COA_selectByDate()
+COA_selectByDate<- function(erp_token,FDate) {
+
+  sql=paste0("exec rds_proc_ReportItem_DeliveryNotice_listByDate '",FDate,"'   ")
+
+  res=tsda::sql_select2(token = erp_token,sql = sql)
+  return(res)
+}
+
+#' 按月查询COA记录
+#'
+#' @param token
+#' @param FDate
+
+#' @return 无返回值
+#' @export
+#'
+#' @examples
+#' COA_selectByMonth()
+COA_selectByMonth<- function(erp_token,FDate) {
+
+  sql=paste0("exec rds_proc_ReportItem_DeliveryNotice_listByMonth '",FDate,"'   ")
+
+  res=tsda::sql_select2(token = erp_token,sql = sql)
+  return(res)
+}
+
+
