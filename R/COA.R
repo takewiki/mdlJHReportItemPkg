@@ -248,7 +248,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
     template_coa = coa_GetTemplateNumber(erpToken = erpToken,FBillNo = FBillNo)
 
     if(is.null(template_coa)){
-      print(paste0("销售出库单",FBillNo,"模板号为空，请及时维护"))
+      print(paste0("发货通知单",FBillNo,"模板号为空，请及时维护"))
       res = 0
     }else{
       print(2)
@@ -266,8 +266,14 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
       ncount_meta_entry = nrow(meta_entry)
       fields_entry = paste0(meta_entry$FName_ERP_en,collapse = " , ")
       table_entry = meta_entry$FTableName[1]
-      sql_entry = paste0("select  ",fields_entry,"   from  ",table_entry," where FBillNo  = '",FBillNo,"' ")
+      sql_entry = paste0("select  ",fields_entry,"   from  ",table_entry," where FBillNo  = '",FBillNo,"' order by ",fields_entry," ")
       data_entry =  tsda::sql_select2(token = erpToken,sql = sql_entry)
+
+#
+#       print("sql_entry")
+#       print(sql_entry)
+#       print("data_entry")
+#       print(data_entry)
       ncount_entry = nrow(data_entry)
 
 
@@ -439,8 +445,7 @@ coa_pdf <-function (erpToken = 'C0426D23-1927-4314-8736-A74B2EF7A039', FBillNo =
           #         from t_sal_deliveryNotice a
           #         where   CHARINDEX(A.FBILLNO, '",FBillNo,"') > 0 ")
 
-          print("update")
-          print(FBillNo)
+
 
 
           sql_oss = paste0("update B set   F_RDS_QH_QualityReport =1,F_RDS_COA_XLSX ='",Url_excel,"',F_RDS_COA_PDF='",Url_pdf,"'
